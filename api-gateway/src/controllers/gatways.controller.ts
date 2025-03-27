@@ -1,8 +1,8 @@
 import {get,post,requestBody,patch,param,del} from '@loopback/rest';
 import axios from 'axios';
-import { BookValidationService } from '../validators/validation';
+import { BookValidationService } from '../validators/book-validation';
 import { service } from '@loopback/core';
-import { Book } from '../validators/validation';
+import { Book } from '../validators/book-validation';
 
 interface Author{
     name: string;

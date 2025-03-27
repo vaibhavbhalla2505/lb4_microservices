@@ -43,7 +43,7 @@ export class BookValidationService {
     const books = resBooks.data;
     if (bookData.isbn) {
       const isbnExists = books.some((book: { id: number; isbn: string }) =>
-        book.isbn === bookData.isbn && book.id !== bookId // Ignore current book's ISBN
+        book.isbn === bookData.isbn && book.id !== bookId 
       );
 
       if (isbnExists) {

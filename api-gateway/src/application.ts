@@ -9,7 +9,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-import { BookValidationService } from './validators/validation';
+import { BookValidationService } from './validators/book-validation';
 
 export {ApplicationConfig};
 

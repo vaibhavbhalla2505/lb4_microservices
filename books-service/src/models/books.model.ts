@@ -34,12 +34,14 @@ export class Books extends Entity {
   price: number;
 
   @property({
+    name:'author_id',
     type: 'number',
     required: true,
   })
   authorId: number;
 
   @property({
+    name:'category_id',
     type: 'number',
     required: true,
   })
