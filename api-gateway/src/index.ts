@@ -1,3 +1,4 @@
+require('newrelic');
 import {ApplicationConfig, ApiGatewayApplication} from './application';
 
 export * from './application';

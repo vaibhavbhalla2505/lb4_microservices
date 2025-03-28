@@ -1,4 +1,4 @@
-import {get,post,requestBody,patch,param,del} from '@loopback/rest';
+import {get,post,requestBody,patch,param,del,HttpErrors} from '@loopback/rest';
 import axios from 'axios';
 import { BookValidationService } from '../validators/book-validation';
 import { service } from '@loopback/core';
@@ -38,27 +38,27 @@ export class ApiGatewayController {
     try {
       const booksResponse = await axios.get(`${this.bookServiceUrl}/books`);
       const books = booksResponse.data;
-  
+
       const booksWithDetails = await Promise.all(
         books.map(async (book: any) => {
           const author = await this.fetchAuthor(book.authorId);
           const category = await this.fetchCategory(book.categoryId);
-  
+
           return {
             id: book.id,
             title: book.title,
             isbn: book.isbn,
-            publication_date: book.publication_date, 
+            publication_date: book.publication_date,
             price: book.price,
-            author: author?.name || null, 
-            genre: category?.genre || null,
+            author: author.name,
+            genre: category.genre,
           };
         })
       );
-  
+
       return booksWithDetails;
     } catch (error) {
-      return { error: 'Failed to fetch books', details: error.message };
+      throw new HttpErrors.InternalServerError('Category service (Port 3002) is unavailable.');
     }
   }
 
@@ -84,10 +84,15 @@ export class ApiGatewayController {
   }
 
   @get('/authors')
-  async getAllAuthors() {
+async getAllAuthors() {
+  try {
     const response = await axios.get(`${this.authorServiceUrl}/authors`);
     return response.data;
+  } catch (err) {
+    throw new HttpErrors.InternalServerError('Author service (Port 3000) is unavailable.');
   }
+}
+
 
     // Create a new author
   @post('/authors')
@@ -141,8 +146,12 @@ export class ApiGatewayController {
 
   @get('/categories')
   async getAllCategories() {
-    const response = await axios.get(`${this.categoryServiceUrl}/categories`);
-    return response.data;
+    try {
+      const response = await axios.get(`${this.categoryServiceUrl}/categories`);
+      return response.data;
+    } catch (error) {
+      throw new HttpErrors.InternalServerError('Category service (Port 3002) is unavailable.');
+    }
   }
   // Create a new genre
   @post('/categories')
@@ -200,7 +209,7 @@ export class ApiGatewayController {
       const response = await axios.get(`${this.authorServiceUrl}/authors/${authorId}`);
       return response.data;
     } catch (error) {
-      return {error: `Author not found for id ${authorId}`};
+      throw new HttpErrors.InternalServerError('Author service (Port 3000) is unavailable.');
     }
   }
 
@@ -210,7 +219,7 @@ export class ApiGatewayController {
       const response = await axios.get(`${this.categoryServiceUrl}/categories/${categoryId}`);
       return response.data;
     } catch (error) {
-      return {error: `Category not found for id ${categoryId}`};
+      throw new HttpErrors.InternalServerError('Category service (Port 3002) is unavailable.');
     }
   }
 }
