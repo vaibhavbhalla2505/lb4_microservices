@@ -10,7 +10,8 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
 import { BookValidationService } from './validators/book-validation';
-
+import { AuthenticationComponent,Strategies } from 'loopback4-authentication';
+import { BearerTokenVerifyProvider } from './providers/user.provider';
 export {ApplicationConfig};
 
 export class ApiGatewayApplication extends BootMixin(
@@ -30,7 +31,8 @@ export class ApiGatewayApplication extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
-
+    this.component(AuthenticationComponent);
+    this.bind(Strategies.Passport.BEARER_TOKEN_VERIFIER).toProvider(BearerTokenVerifyProvider);
     this.bind('services.BookValidationService').toClass(BookValidationService);
 
     this.projectRoot = __dirname;

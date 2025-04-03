@@ -9,9 +9,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-import { AuthenticationComponent,AuthenticationBindings,Strategies} from 'loopback4-authentication';
-import { User } from './models';
-import { BearerTokenVerifyProvider } from './providers/user.provider';
+import { AuthenticationComponent} from 'loopback4-authentication';
 import dotenv from 'dotenv'
 dotenv.config();
 
@@ -34,8 +32,6 @@ export class UsersApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
     this.component(AuthenticationComponent);
-    this.bind(Strategies.Passport.BEARER_TOKEN_VERIFIER).toProvider(BearerTokenVerifyProvider);
-
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here

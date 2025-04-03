@@ -1,13 +1,6 @@
 import { injectable,bind,BindingScope } from '@loopback/core';
 import axios from 'axios';
-export interface Book{
-    title: string;
-    authorId: number;
-    categoryId: number;
-    publication_date: string;
-    price: number;
-    isbn: string;
-}
+import { Book } from '../interfaces/interface';
 
 @bind({scope: BindingScope.SINGLETON})
 export class BookValidationService {

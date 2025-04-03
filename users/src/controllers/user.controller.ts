@@ -1,54 +1,46 @@
-import {repository} from '@loopback/repository';
-import {post, requestBody, HttpErrors, get, param} from '@loopback/rest';
-import {UserRepository} from '../repositories';
+import {
+  Filter,
+  FilterExcludingWhere,
+  repository,
+} from '@loopback/repository';
+import {
+  param,
+  get,
+  getModelSchemaRef,
+  del,
+  response,
+} from '@loopback/rest';
 import {User} from '../models';
-import {sign} from 'jsonwebtoken';
-import {compare, hash} from 'bcryptjs';
-import {authenticate, Strategies, STRATEGY} from 'loopback4-authentication';
-
+import {UserRepository} from '../repositories';
 export class UserController {
   constructor(
     @repository(UserRepository)
-    public userRepository: UserRepository,
+    public userRepository : UserRepository,
   ) {}
 
-  // Signup Method
-  @post('/signup', {
-    responses: {
-      '200': {
-        description: 'User Signup',
-        content: {'application/json': {schema: {'x-ts-type': User}}},
+  @get('/users')
+  @response(200, {
+    description: 'Array of User model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(User, {includeRelations: true}),
+        },
       },
     },
   })
-  async signup(
-    @requestBody() userData: Omit<User, 'id'>,
-  ) {
-    userData.password = await hash(userData.password, 10);
-    const newUser = await this.userRepository.create(userData);
-    const token = sign({id: newUser.id, role: newUser.role}, process.env.JWT_SECRET as string, {expiresIn: '1h'});
-    return {token};
+  async find(
+    @param.filter(User) filter?: Filter<User>,
+  ): Promise<User[]> {
+    return this.userRepository.find(filter);
   }
 
-  // Login Method
-  @post('/login', {
-    responses: {
-      '200': {
-        description: 'User Login',
-        content: {'application/json': {schema: {'x-ts-type': User}}},
-      },
-    },
+  @del('/users/{id}')
+  @response(204, {
+    description: 'User DELETE success',
   })
-  async login(
-    @requestBody() credentials: {email: string; password: string},
-  ) {
-    const user = await this.userRepository.findOne({where: {email: credentials.email}});
-    if (!user) throw new HttpErrors.Unauthorized('Invalid email or password');
-
-    const passwordMatch = await compare(credentials.password, user.password);
-    if (!passwordMatch) throw new HttpErrors.Unauthorized('Invalid email or password');
-
-    const token = sign({id: user.id, role: user.role}, process.env.JWT_SECRET as string, {expiresIn: '1h'});
-    return {user, token};
+  async deleteById(@param.path.number('id') id: number): Promise<void> {
+    await this.userRepository.deleteById(id);
   }
 }

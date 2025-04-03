@@ -57,6 +57,7 @@
     "@loopback/service-proxy": "^7.0.10",
     "axios": "^1.8.4",
     "dotenv": "^16.4.7",
+    "loopback4-authentication": "^12.2.0",
     "newrelic": "^12.16.1",
     "tslib": "^2.0.0"
   },
@@ -64,6 +65,7 @@
     "@loopback/build": "^11.0.9",
     "@loopback/eslint-config": "^15.0.5",
     "@loopback/testlab": "^7.0.9",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^16.18.123",
     "eslint": "^8.57.1",
     "source-map-support": "^0.5.21",

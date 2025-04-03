@@ -2,29 +2,25 @@ import {get,post,requestBody,patch,param,del,HttpErrors} from '@loopback/rest';
 import axios from 'axios';
 import { BookValidationService } from '../validators/book-validation';
 import { service } from '@loopback/core';
-import { Book } from '../validators/book-validation';
-
-interface Author{
-    name: string;
-}
-interface Category{
-    genre: string;
-}
+import { authenticate,STRATEGY} from 'loopback4-authentication';
+import { UserSignUp,Author,Category,UserLogin,Book } from '../interfaces/interface';
 
 export class ApiGatewayController {
   private bookServiceUrl = 'http://localhost:3001'; 
   private authorServiceUrl = 'http://localhost:3000';
   private categoryServiceUrl = 'http://localhost:3002';
+  private userServiceUrl = 'http://localhost:3004';
 
   constructor(
     @service(BookValidationService)
     private bookValidationService: BookValidationService,
   ) {}
 
+  @authenticate(STRATEGY.BEARER)
   @post('/books')
   async createBook(@requestBody() bookData: Book) {
     try {
-        await this.bookValidationService.validateBookData(bookData);
+      await this.bookValidationService.validateBookData(bookData);
 
       const response = await axios.post(`${this.bookServiceUrl}/books`, bookData);
       return response.data;
@@ -33,6 +29,7 @@ export class ApiGatewayController {
     }
   }
 
+  @authenticate(STRATEGY.BEARER)
   @get('/books')
   async getBooks() {
     try {
@@ -62,6 +59,7 @@ export class ApiGatewayController {
     }
   }
 
+  @authenticate(STRATEGY.BEARER)
   @patch('/books/{id}')
   async patchBook(@param.path.number('id') id: number, @requestBody() bookData: Book) {
     try {
@@ -73,6 +71,7 @@ export class ApiGatewayController {
     }
   }
 
+  @authenticate(STRATEGY.BEARER)
   @del('/books/{id}')
   async deleteBook(@param.path.number('id') id: number) {
     try {
@@ -83,6 +82,7 @@ export class ApiGatewayController {
     }
   }
 
+  @authenticate(STRATEGY.BEARER)
   @get('/authors')
 async getAllAuthors() {
   try {
@@ -93,8 +93,8 @@ async getAllAuthors() {
   }
 }
 
-
     // Create a new author
+    @authenticate(STRATEGY.BEARER)
   @post('/authors')
   async createAuthor(@requestBody() authorData: Author) {
     try {
@@ -110,6 +110,7 @@ async getAllAuthors() {
   }
   
     // Update an existing author
+    @authenticate(STRATEGY.BEARER)
   @patch('/authors/{id}')
   async updateAuthor(@param.path.number('id') id: number, @requestBody() authorData: Partial<Author>) {
     try {
@@ -125,6 +126,7 @@ async getAllAuthors() {
   }
   
     // Delete an author
+    @authenticate(STRATEGY.BEARER)
   @del('/authors/{id}')
   async deleteAuthor(@param.path.number('id') id: number) {
     try {
@@ -144,6 +146,7 @@ async getAllAuthors() {
     }
   }
 
+  @authenticate(STRATEGY.BEARER)
   @get('/categories')
   async getAllCategories() {
     try {
@@ -154,6 +157,7 @@ async getAllAuthors() {
     }
   }
   // Create a new genre
+  @authenticate(STRATEGY.BEARER)
   @post('/categories')
   async createCategory(@requestBody() categoryData: Category) {
     try {
@@ -169,6 +173,7 @@ async getAllAuthors() {
   }
   
     // Update an existing genre
+    @authenticate(STRATEGY.BEARER)
   @patch('/categories/{id}')
   async updateCategory(@param.path.number('id') id: number, @requestBody() categoryData: Partial<Category>) {
     try {
@@ -184,6 +189,7 @@ async getAllAuthors() {
   }
   
     // Delete a genre
+    @authenticate(STRATEGY.BEARER)
   @del('/categories/{id}')
   async deleteCategory(@param.path.number('id') id: number) {
     try {
@@ -202,9 +208,62 @@ async getAllAuthors() {
         return { error: 'Failed to delete genre', details: error.message };
     }
   }
-  
-  //fetch the authors
-  private async fetchAuthor(authorId: number) {
+
+  @post('/signup')
+  async signup(@requestBody() user: UserSignUp) {
+    if (!user.username) {
+      throw new Error('username is required.');
+    }
+    if (!user.email) {
+      throw new Error('email is required.');
+    }
+    if (!user.password) {
+      throw new Error('password is required.');
+    }
+    if (!user.role) {
+      throw new Error('role is required.');
+    }
+
+    const response = await axios.post(`${this.userServiceUrl}/signup`, user);
+    return response.data;
+  }
+
+  @post('/login')
+  async login(@requestBody() user: UserLogin) {
+    if (!user.email) {
+      throw new Error('email is required.');
+    }
+    if (!user.password) {
+      throw new Error('password is required.');
+    }
+    const response = await axios.post(`${this.userServiceUrl}/login`, user);
+    return response.data;
+  }
+
+  @authenticate(STRATEGY.BEARER)
+  @get('/users')
+  async getAllUsers() {
+    try {
+      const response = await axios.get(`${this.userServiceUrl}/users`);
+      return response.data;
+    } catch (err) {
+      throw new HttpErrors.InternalServerError('User service (Port 3004) is unavailable.');
+    }
+  }
+
+  @authenticate(STRATEGY.BEARER)
+  @del('/users/{id}')
+  async deleteUser(@param.path.number('id') id: number) {
+    try {
+        const response = await axios.delete(`${this.userServiceUrl}/users/${id}`);
+        return { message: 'User deleted successfully'};
+    } catch (error) {
+      throw new HttpErrors.InternalServerError('User service (Port 3004) is unavailable.');
+    }
+  }
+
+    //fetch the authors
+    private async fetchAuthor(authorId: number) {
       try {
       const response = await axios.get(`${this.authorServiceUrl}/authors/${authorId}`);
       return response.data;
