@@ -3,6 +3,7 @@ export interface UserSignUp{
     password: string;
     role: string;
     email: string;
+    permissions?:string[];
 }
 export interface Author{
     name: string;

@@ -4,7 +4,8 @@ import { BookValidationService } from '../validators/book-validation';
 import { service } from '@loopback/core';
 import { authenticate,STRATEGY} from 'loopback4-authentication';
 import { UserSignUp,Author,Category,UserLogin,Book } from '../interfaces/interface';
-
+import { authorize } from 'loopback4-authorization';
+import { PermissionKey } from '../enums/permission-key.enum';
 export class ApiGatewayController {
   private bookServiceUrl = 'http://localhost:3001'; 
   private authorServiceUrl = 'http://localhost:3000';
@@ -17,6 +18,7 @@ export class ApiGatewayController {
   ) {}
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.PostBook]})
   @post('/books')
   async createBook(@requestBody() bookData: Book) {
     try {
@@ -30,6 +32,7 @@ export class ApiGatewayController {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.ViewBook]})
   @get('/books')
   async getBooks() {
     try {
@@ -60,6 +63,7 @@ export class ApiGatewayController {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.UpdateBook]})
   @patch('/books/{id}')
   async patchBook(@param.path.number('id') id: number, @requestBody() bookData: Book) {
     try {
@@ -72,6 +76,7 @@ export class ApiGatewayController {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.DeleteBook]})
   @del('/books/{id}')
   async deleteBook(@param.path.number('id') id: number) {
     try {
@@ -83,6 +88,7 @@ export class ApiGatewayController {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.ViewAuthor]})
   @get('/authors')
 async getAllAuthors() {
   try {
@@ -95,6 +101,7 @@ async getAllAuthors() {
 
     // Create a new author
     @authenticate(STRATEGY.BEARER)
+    @authorize({permissions:[PermissionKey.PostAuthor]})
   @post('/authors')
   async createAuthor(@requestBody() authorData: Author) {
     try {
@@ -111,6 +118,7 @@ async getAllAuthors() {
   
     // Update an existing author
     @authenticate(STRATEGY.BEARER)
+    @authorize({permissions:[PermissionKey.UpdateAuthor]})
   @patch('/authors/{id}')
   async updateAuthor(@param.path.number('id') id: number, @requestBody() authorData: Partial<Author>) {
     try {
@@ -127,6 +135,7 @@ async getAllAuthors() {
   
     // Delete an author
     @authenticate(STRATEGY.BEARER)
+    @authorize({permissions:[PermissionKey.DeleteAuthor]})
   @del('/authors/{id}')
   async deleteAuthor(@param.path.number('id') id: number) {
     try {
@@ -147,6 +156,7 @@ async getAllAuthors() {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.ViewCategory]})
   @get('/categories')
   async getAllCategories() {
     try {
@@ -158,6 +168,7 @@ async getAllAuthors() {
   }
   // Create a new genre
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.PostCategory]})
   @post('/categories')
   async createCategory(@requestBody() categoryData: Category) {
     try {
@@ -174,6 +185,7 @@ async getAllAuthors() {
   
     // Update an existing genre
     @authenticate(STRATEGY.BEARER)
+    @authorize({permissions:[PermissionKey.PostCategory]})
   @patch('/categories/{id}')
   async updateCategory(@param.path.number('id') id: number, @requestBody() categoryData: Partial<Category>) {
     try {
@@ -190,6 +202,7 @@ async getAllAuthors() {
   
     // Delete a genre
     @authenticate(STRATEGY.BEARER)
+    @authorize({permissions:[PermissionKey.DeleteCategory]})
   @del('/categories/{id}')
   async deleteCategory(@param.path.number('id') id: number) {
     try {
@@ -241,6 +254,7 @@ async getAllAuthors() {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.ViewUser]})
   @get('/users')
   async getAllUsers() {
     try {
@@ -252,6 +266,7 @@ async getAllAuthors() {
   }
 
   @authenticate(STRATEGY.BEARER)
+  @authorize({permissions:[PermissionKey.DeleteUser]})
   @del('/users/{id}')
   async deleteUser(@param.path.number('id') id: number) {
     try {

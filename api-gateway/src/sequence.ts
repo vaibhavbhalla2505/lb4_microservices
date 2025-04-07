@@ -2,6 +2,7 @@ import {
     AuthenticateFn,
     AuthenticationBindings,
   } from 'loopback4-authentication';
+  import { AuthorizationBindings,AuthorizeFn,AuthorizeErrorKeys} from 'loopback4-authorization';
   import {
     SequenceHandler,
     FindRoute,
@@ -11,8 +12,9 @@ import {
     RequestContext,
     Send,
     SequenceActions,
+    HttpErrors
   } from '@loopback/rest';
-  import { inject } from '@loopback/context';
+  import { inject} from '@loopback/context';
   import { UserSignUp } from './interfaces/interface';
   export class MySequence implements SequenceHandler {
     constructor(
@@ -22,19 +24,30 @@ import {
       @inject(SequenceActions.SEND) public send: Send,
       @inject(SequenceActions.REJECT) public reject: Reject,
       @inject(AuthenticationBindings.USER_AUTH_ACTION)
-      protected authenticateRequest: AuthenticateFn<UserSignUp>,
+      protected authenticateRequest: AuthenticateFn<any>,
+      @inject(AuthorizationBindings.AUTHORIZE_ACTION)
+      protected checkAuthorization: AuthorizeFn,
     ) {}
   
     async handle(context: RequestContext) {
       try {
         const {request, response} = context;
         const route = this.findRoute(request);
-        const args = await this.parseParams(request, route);
-  
-        // Perform authentication
-        const authUser: UserSignUp = await this.authenticateRequest(request);
-        request.body = {...request.body, authUser};
 
+        // Perform authentication
+        const authUser: any = await this.authenticateRequest(request);
+        (request as any).user = authUser;
+        if(authUser){
+            const isAccessAllowed: boolean = await this.checkAuthorization(
+              authUser?.permissions || [],
+              request,
+            );
+            if (!isAccessAllowed) {
+              throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+            }
+        }
+       
+        const args = await this.parseParams(request, route);
         const result = await this.invoke(route, args);
         this.send(response, result);
       } catch (err) {

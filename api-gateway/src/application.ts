@@ -12,6 +12,7 @@ import {MySequence} from './sequence';
 import { BookValidationService } from './validators/book-validation';
 import { AuthenticationComponent,Strategies } from 'loopback4-authentication';
 import { BearerTokenVerifyProvider } from './providers/user.provider';
+import { AuthorizationComponent } from 'loopback4-authorization';
 export {ApplicationConfig};
 
 export class ApiGatewayApplication extends BootMixin(
@@ -31,12 +32,6 @@ export class ApiGatewayApplication extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
-    this.component(AuthenticationComponent);
-    this.bind(Strategies.Passport.BEARER_TOKEN_VERIFIER).toProvider(BearerTokenVerifyProvider);
-    this.bind('services.BookValidationService').toClass(BookValidationService);
-
-    this.projectRoot = __dirname;
-    // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {
       controllers: {
         // Customize ControllerBooter Conventions here
@@ -45,5 +40,13 @@ export class ApiGatewayApplication extends BootMixin(
         nested: true,
       },
     };
+    this.component(AuthenticationComponent);
+    this.bind('sf.userAuthorization.config').to({});
+    this.component(AuthorizationComponent)
+    this.bind(Strategies.Passport.BEARER_TOKEN_VERIFIER).toProvider(BearerTokenVerifyProvider);
+    this.bind('services.BookValidationService').toClass(BookValidationService);
+
+    this.projectRoot = __dirname;
+    // Customize @loopback/boot Booter Conventions here
   }
 }
