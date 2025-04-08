@@ -18,6 +18,8 @@ export const RolePermissions: {[role: string]: PermissionKey[]} = {
     PermissionKey.DeleteUser
   ],
   user:[
-    PermissionKey.ViewBook
+    PermissionKey.ViewBook,
+    PermissionKey.ViewAuthor,
+    PermissionKey.ViewCategory
   ]
 };

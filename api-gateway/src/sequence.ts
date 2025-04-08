@@ -15,7 +15,6 @@ import {
     HttpErrors
   } from '@loopback/rest';
   import { inject} from '@loopback/context';
-  import { UserSignUp } from './interfaces/interface';
   export class MySequence implements SequenceHandler {
     constructor(
       @inject(SequenceActions.FIND_ROUTE) protected findRoute: FindRoute,
