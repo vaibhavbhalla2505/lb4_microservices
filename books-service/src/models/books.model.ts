@@ -22,10 +22,11 @@ export class Books extends Entity {
   isbn: string;
 
   @property({
+    name:'publication_date',
     type: 'string',
     required: true,
   })
-  publication_date: string;
+  publicationDate: string;
 
   @property({
     type: 'number',
