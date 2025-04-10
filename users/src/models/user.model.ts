@@ -27,12 +27,6 @@ export class User extends Entity implements IAuthUser {
   })
   password: string;
 
-  // @property({
-  //   type: 'string',
-  //   required: true,
-  // })
-  // token: string;
-
   @property({
     type: 'string',
     required: true,

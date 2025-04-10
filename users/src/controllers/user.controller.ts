@@ -1,6 +1,5 @@
 import {
   Filter,
-  FilterExcludingWhere,
   repository,
 } from '@loopback/repository';
 import {

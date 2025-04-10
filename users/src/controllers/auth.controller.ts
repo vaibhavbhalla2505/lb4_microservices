@@ -1,5 +1,5 @@
 import {repository} from '@loopback/repository';
-import {post, requestBody, HttpErrors, get, param} from '@loopback/rest';
+import {post, requestBody, HttpErrors} from '@loopback/rest';
 import {UserRepository} from '../repositories';
 import {User} from '../models';
 import {sign} from 'jsonwebtoken';
