@@ -16,10 +16,11 @@ export interface UserLogin{
   password: string;
 }
 export interface Book{
+    id:number
     title: string;
     authorId: number;
     categoryId: number;
-    publication_date: string;
+    publicationDate: string;
     price: number;
     isbn: string;
 }

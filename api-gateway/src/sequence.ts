@@ -15,6 +15,7 @@ import {
     HttpErrors
   } from '@loopback/rest';
   import { inject} from '@loopback/context';
+import { UserSignUp } from './interfaces/interface';
   export class MySequence implements SequenceHandler {
     constructor(
       @inject(SequenceActions.FIND_ROUTE) protected findRoute: FindRoute,
@@ -23,7 +24,7 @@ import {
       @inject(SequenceActions.SEND) public send: Send,
       @inject(SequenceActions.REJECT) public reject: Reject,
       @inject(AuthenticationBindings.USER_AUTH_ACTION)
-      protected authenticateRequest: AuthenticateFn<any>,
+      protected authenticateRequest: AuthenticateFn<UserSignUp>,
       @inject(AuthorizationBindings.AUTHORIZE_ACTION)
       protected checkAuthorization: AuthorizeFn,
     ) {}
@@ -34,11 +35,11 @@ import {
         const route = this.findRoute(request);
 
         // Perform authentication
-        const authUser: any = await this.authenticateRequest(request);
+        const authUser: UserSignUp = await this.authenticateRequest(request);
         (request as any).user = authUser;
         if(authUser){
             const isAccessAllowed: boolean = await this.checkAuthorization(
-              authUser?.permissions || [],
+              authUser?.permissions ?? [],
               request,
             );
             if (!isAccessAllowed) {

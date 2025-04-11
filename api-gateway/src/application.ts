@@ -9,7 +9,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-import { BookValidationService } from './validators/book-validation';
+import { BookValidationService } from './validators/book.validation';
 import { AuthenticationComponent,Strategies } from 'loopback4-authentication';
 import { BearerTokenVerifyProvider } from './providers/user.provider';
 import { AuthorizationComponent } from 'loopback4-authorization';
